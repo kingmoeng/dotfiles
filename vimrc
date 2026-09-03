@@ -33,3 +33,8 @@ set incsearch        " 타이핑하면서 실시간 검색
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
+
+" 마크다운
+" 기본 markdown 문법이 snake_case 같은 단어 안의 언더바를 Error로 강조하는데
+" (Markdown.pl 시절 경고) CommonMark/GFM에서는 문제 없으므로 규칙 제거
+autocmd FileType markdown syntax clear markdownError
