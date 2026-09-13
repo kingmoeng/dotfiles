@@ -29,10 +29,13 @@ link() {
 echo "dotfiles: $DOTFILES_DIR"
 echo
 
-echo "[공통 / zsh / vim]"
-link shellrc "$HOME/.shellrc"
-link zshrc   "$HOME/.zshrc"
-link vimrc   "$HOME/.vimrc"
+echo "[공통 / zsh / vim / tmux]"
+link shellrc   "$HOME/.shellrc"
+link zshrc     "$HOME/.zshrc"
+link vimrc     "$HOME/.vimrc"
+# tmux 3.1+ 는 ~/.config/tmux/tmux.conf 도 읽지만, 오래된 서버까지 생각하면
+# ~/.tmux.conf 가 무난하다. 경로를 바꾸면 tmux.conf 의 bind r 도 같이 고칠 것.
+link tmux.conf "$HOME/.tmux.conf"
 
 echo
 echo "[bash]"
