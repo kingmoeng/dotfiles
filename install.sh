@@ -62,4 +62,24 @@ fi
 mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"
 
 echo
+echo "[claude]"
+link claude/statusline.sh "$HOME/.claude/statusline.sh"
+# settings.json 은 머신별 설정(hooks, 권한 등)이 섞여 있어 링크하지 않고
+# statusLine 키만 넣는다. 나머지 키는 건드리지 않는다.
+settings="$HOME/.claude/settings.json"
+statusline_cmd='~/.claude/statusline.sh'
+if ! command -v jq >/dev/null 2>&1; then
+  echo "  ! jq 가 없어 $settings 를 건너뜀 (statusline 도 jq 가 필요함)"
+elif [ -f "$settings" ] && [ "$(jq -r '.statusLine.command // empty' "$settings")" = "$statusline_cmd" ]; then
+  echo "  = $settings statusLine (이미 설정됨)"
+else
+  [ -f "$settings" ] || echo '{}' > "$settings"
+  tmp="$(mktemp)"
+  jq --arg cmd "$statusline_cmd" '.statusLine = {type: "command", command: $cmd}' "$settings" > "$tmp"
+  cat "$tmp" > "$settings" # mv 대신 cat: 파일 권한과 심볼릭 링크를 유지
+  rm -f "$tmp"
+  echo "  + $settings statusLine"
+fi
+
+echo
 echo "완료. 새 터미널을 열거나 'source ~/.bashrc' 로 적용하세요."

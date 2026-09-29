@@ -10,6 +10,7 @@ macOS / Fedora / WSL2 에서 공유하는 셸·vim·tmux 설정.
 | `zshrc` | `~/.zshrc` | zsh 전용. 프롬프트, 히스토리, 자동완성, 키바인딩, 플러그인 |
 | `vimrc` | `~/.vimrc` | vim 설정 |
 | `tmux.conf` | `~/.tmux.conf` | tmux 설정. prefix, 분할·세션 키, 마우스, 스크롤백 |
+| `claude/statusline.sh` | `~/.claude/statusline.sh` | Claude Code statusline. 모델, 남은 context, 5시간·7일 사용 한도 |
 | `install.sh` | — | 위 파일들을 심볼릭 링크로 연결 |
 
 `shellrc`는 bash에서도 읽힌다. Fedora 계열은 `~/.bashrc.d/00-shellrc.sh` 드롭인으로,
@@ -25,17 +26,20 @@ git clone <저장소 URL> ~/dotfiles
 
 기존 파일은 `~/.dotfiles-backup/<타임스탬프>/` 로 백업된다. 여러 번 실행해도 안전하다.
 
+`~/.claude/settings.json` 은 머신별 설정이 섞여 있어 링크하지 않고, `statusLine` 키만
+`jq` 로 넣는다. 그래서 statusline 을 쓰려면 `jq` 가 필요하다.
+
 ### 필요한 패키지
 
 ```sh
 # Fedora
-sudo dnf install zsh zsh-autosuggestions vim-enhanced tmux
+sudo dnf install zsh zsh-autosuggestions vim-enhanced tmux jq
 
 # macOS
-brew install zsh-autosuggestions tmux
+brew install zsh-autosuggestions tmux jq
 
 # Debian/Ubuntu (WSL2)
-sudo apt install zsh zsh-autosuggestions vim tmux
+sudo apt install zsh zsh-autosuggestions vim tmux jq
 ```
 
 ### 기본 셸 변경
@@ -90,8 +94,8 @@ prefix 와 base-index 는 새 세션부터 확실히 반영되므로 한 번 다
   `source` 한 줄 하는 편이 디버깅할 레이어가 적다.
 - **`zsh-syntax-highlighting`은 일부러 뺐다.** 키 입력마다 명령줄 전체를 재파싱해 긴 줄에서
   느려진다. 필요하면 `zshrc`의 주석 블록을 풀 것.
-- **nvm은 쓰지 않는다.** node는 버전 하나(24)만 시스템 패키지로 설치한다. nvm.sh는 셸 시작을
-  ~100ms 늦추고 PATH·래퍼 함수가 꼬이는 원인이 돼서 뺐다.
+- **nvm은 쓰지 않는다.** node는 시스템 패키지(brew·apt 등)로 하나만 설치하고, 버전은
+  여기서 관리하지 않는다. nvm.sh는 셸 시작을 ~100ms 늦추고 PATH·래퍼 함수가 꼬이는 원인이 돼서 뺐다.
 - **tmux prefix `Ctrl+Space`는 입력기와 겹친다.** macOS는 시스템 설정 → 키보드 → 단축키 →
   입력 소스에서, 리눅스는 IBus 설정에서 입력 소스 전환 단축키를 먼저 꺼야 한다.
 - **`tmux-256color` terminfo가 없는 서버가 있다.** 그대로 두면 색이 깨지거나
