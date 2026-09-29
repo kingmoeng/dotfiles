@@ -59,19 +59,6 @@ fi
 
 export BUN_INSTALL="$HOME/.bun"
 
-# ------------------------------------------------------------------ nvm
-# 설치돼 있을 때만 로드한다. nvm.sh는 무거워서(~100ms) 셸 시작이 느려지므로,
-# 필요 없어지면 이 블록을 지울 것.
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-for _nvm in "$NVM_DIR/nvm.sh" "/opt/homebrew/opt/nvm/nvm.sh"; do
-  if [ -s "$_nvm" ]; then
-    # shellcheck disable=SC1090
-    . "$_nvm"
-    break
-  fi
-done
-unset _nvm
-
 # ------------------------------------------------------------------ alias
 # ls 색상 옵션은 BSD(macOS)와 GNU(Linux)가 다르다.
 # GNU ls에서 -G는 "색상"이 아니라 "그룹 열 숨기기"이므로 그대로 쓰면 안 된다.
