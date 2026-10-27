@@ -124,12 +124,10 @@ fi
       exit
     fi
     local new=$(git rev-parse HEAD)
-    # 링크는 파일 단위라 새 파일이 생기거나 install.sh 가 바뀌면 다시 설치해야 한다.
-    local reinstall=(${(f)"$(git diff --name-only --diff-filter=A $old $new)"})
-    git diff --quiet $old $new -- install.sh || reinstall+=(install.sh)
     {
       print -r -- "dotfiles: $(git rev-list --count $old..$new)개 커밋 반영 (${old:0:7}..${new:0:7})"
-      (( $#reinstall )) && print -r -- "└ install.sh 다시 실행 필요: ${(j:, :)reinstall}"
+      # 링크를 추가·변경하려면 반드시 install.sh 를 고쳐야 하므로 그것만 보면 된다.
+      git diff --quiet $old $new -- install.sh || print -r -- "└ install.sh 가 바뀌었으니 다시 실행할 것"
     } > $msg
   ) &>/dev/null &!
 }
