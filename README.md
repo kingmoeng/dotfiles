@@ -24,7 +24,15 @@ git clone <저장소 URL> ~/dotfiles
 ~/dotfiles/install.sh
 ```
 
+저장소 위치는 어디든 상관없다. `install.sh` 는 자기가 있는 디렉터리를 가리키는 심볼릭
+링크를 만들므로, 옮긴 뒤에는 새 위치에서 다시 실행하면 된다.
+
 기존 파일은 `~/.dotfiles-backup/<타임스탬프>/` 로 백업된다. 여러 번 실행해도 안전하다.
+
+특정 머신에서만 필요한 설정(설치 스크립트가 덧붙이는 bun·SDKMAN 초기화, 토큰 등)은
+저장소에 넣지 말고 `~/.shellrc.local`(공통) 또는 `~/.zshrc.local`(zsh 전용)에 둔다.
+프롬프트의 머신 태그/색도 `~/.shellrc.local` 에서 `PROMPT_HOST_TAG` / `PROMPT_HOST_COLOR`
+로 바꿀 수 있다.
 
 `~/.claude/settings.json` 은 머신별 설정이 섞여 있어 링크하지 않고, `statusLine` 키만
 `jq` 로 넣는다. 그래서 statusline 을 쓰려면 `jq` 가 필요하다.

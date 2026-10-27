@@ -5,7 +5,21 @@
 [ -f "$HOME/.shellrc" ] && source "$HOME/.shellrc"
 
 # ------------------------------------------------------------------ 프롬프트
-PROMPT='%F{cyan}%n%f %F{yellow}%~%f > '
+# 세 머신의 사용자 이름이 같아서 %n 대신 머신 태그를 색으로 구분한다.
+# 셸 시작 시 한 번만 계산된다. 태그/색을 바꾸려면 ~/.shellrc.local 에서
+# PROMPT_HOST_TAG / PROMPT_HOST_COLOR 를 지정한다.
+case $DOTFILES_OS in
+  macos) : ${PROMPT_HOST_TAG:=mac} ${PROMPT_HOST_COLOR:=magenta} ;;
+  wsl)   : ${PROMPT_HOST_TAG:=wsl} ${PROMPT_HOST_COLOR:=blue} ;;
+  linux) : ${PROMPT_HOST_TAG:=$(. /etc/os-release 2>/dev/null && echo ${ID:-linux})} \
+           ${PROMPT_HOST_COLOR:=green} ;;
+  *)     : ${PROMPT_HOST_TAG:=%m} ${PROMPT_HOST_COLOR:=white} ;;
+esac
+# source ~/.zshrc 를 다시 해도 ssh: 가 중복으로 붙지 않게 임시 변수에 조립한다.
+_tag=$PROMPT_HOST_TAG
+[[ -n $SSH_CONNECTION ]] && _tag="ssh:$_tag"
+PROMPT="%F{$PROMPT_HOST_COLOR}%B${_tag}%b%f %F{yellow}%~%f > "
+unset _tag
 
 # ------------------------------------------------------------------ 히스토리
 HISTFILE=~/.zsh_history

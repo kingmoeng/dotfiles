@@ -8,7 +8,8 @@
 case "$(uname -s)" in
   Darwin) DOTFILES_OS=macos ;;
   Linux)
-    if [ -n "${WSL_DISTRO_NAME:-}" ]; then
+    # SSH로 들어오면 WSL_DISTRO_NAME이 없을 수 있어서 커널 이름도 본다.
+    if [ -n "${WSL_DISTRO_NAME:-}" ] || uname -r | grep -qi microsoft; then
       DOTFILES_OS=wsl
     else
       DOTFILES_OS=linux
