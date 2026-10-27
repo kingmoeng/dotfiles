@@ -90,5 +90,49 @@ if command -v fzf >/dev/null 2>&1; then
   fi
 fi
 
+# ------------------------------------------------------------------ 자동 업데이트
+# 하루 한 번 백그라운드에서 이 저장소를 fast-forward 하고, 결과는 다음 셸 시작 때
+# 한 번만 알린다. 로컬 수정이 있거나 원격과 갈라졌으면 건드리지 않고 알리기만 한다.
+# 오프라인 등으로 fetch 가 실패하면 조용히 넘어가고 다음 날 다시 시도한다.
+() {
+  local repo=${${(%):-%x}:A:h}          # 심볼릭 링크를 따라간 실제 저장소 위치
+  local cache=${XDG_CACHE_HOME:-$HOME/.cache}
+  local stamp=$cache/dotfiles-update msg=$cache/dotfiles-update.msg
+
+  if [[ -s $msg ]]; then
+    print -r -- "$(<$msg)"
+    rm -f $msg
+  fi
+
+  local fresh=($stamp(Nmh-24))          # 24시간 안에 확인했으면 건너뜀
+  (( $#fresh )) && return
+  mkdir -p $cache && touch $stamp
+
+  (
+    cd $repo || exit
+    # 인증이 필요해지면(비공개 전환, SSH 원격 등) 묻지 말고 바로 실패하게 한다.
+    export GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND='ssh -o BatchMode=yes'
+    if [[ -n $(git status --porcelain) ]]; then
+      print -r -- "dotfiles: 로컬 수정이 있어 업데이트 건너뜀 ($repo 에서 git status 확인)" > $msg
+      exit
+    fi
+    git fetch -q || exit
+    git merge-base --is-ancestor @{u} HEAD && exit   # 받을 것이 없음
+    local old=$(git rev-parse HEAD)
+    if ! git merge -q --ff-only @{u}; then
+      print -r -- "dotfiles: 원격과 갈라져서 수동 처리 필요 ($repo)" > $msg
+      exit
+    fi
+    local new=$(git rev-parse HEAD)
+    # 링크는 파일 단위라 새 파일이 생기거나 install.sh 가 바뀌면 다시 설치해야 한다.
+    local reinstall=(${(f)"$(git diff --name-only --diff-filter=A $old $new)"})
+    git diff --quiet $old $new -- install.sh || reinstall+=(install.sh)
+    {
+      print -r -- "dotfiles: $(git rev-list --count $old..$new)개 커밋 반영 (${old:0:7}..${new:0:7})"
+      (( $#reinstall )) && print -r -- "└ install.sh 다시 실행 필요: ${(j:, :)reinstall}"
+    } > $msg
+  ) &>/dev/null &!
+}
+
 # ------------------------------------------------------------------ 머신 전용
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

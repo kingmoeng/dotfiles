@@ -29,6 +29,11 @@ git clone <저장소 URL> ~/dotfiles
 
 기존 파일은 `~/.dotfiles-backup/<타임스탬프>/` 로 백업된다. 여러 번 실행해도 안전하다.
 
+설치 후에는 zsh 를 열 때 하루 한 번 백그라운드에서 저장소를 확인해 fast-forward 로
+당겨 오고, 결과는 다음 셸 시작 때 한 줄로 알려 준다. 새 파일이 추가돼 `install.sh` 를
+다시 실행해야 하거나, 로컬 수정이 있어 건너뛰었을 때도 알려 준다. 인증은 필요 없다(공개
+저장소 HTTPS fetch).
+
 특정 머신에서만 필요한 설정(설치 스크립트가 덧붙이는 bun·SDKMAN 초기화, 토큰 등)은
 저장소에 넣지 말고 `~/.shellrc.local`(공통) 또는 `~/.zshrc.local`(zsh 전용)에 둔다.
 프롬프트의 머신 태그/색도 `~/.shellrc.local` 에서 `PROMPT_HOST_TAG` / `PROMPT_HOST_COLOR`
