@@ -15,11 +15,9 @@ case $DOTFILES_OS in
            ${PROMPT_HOST_COLOR:=green} ;;
   *)     : ${PROMPT_HOST_TAG:=%m} ${PROMPT_HOST_COLOR:=white} ;;
 esac
-# source ~/.zshrc 를 다시 해도 ssh: 가 중복으로 붙지 않게 임시 변수에 조립한다.
-_tag=$PROMPT_HOST_TAG
-[[ -n $SSH_CONNECTION ]] && _tag="ssh:$_tag"
-PROMPT="%F{$PROMPT_HOST_COLOR}%B${_tag}%b%f %F{yellow}%~%f > "
-unset _tag
+# ssh: 표시는 하지 않는다. herdr/tmux pane 은 서버를 처음 띄운 셸의
+# SSH_CONNECTION 을 물려받아서 지금 SSH 접속인지 알 수 없다.
+PROMPT="%F{$PROMPT_HOST_COLOR}%B${PROMPT_HOST_TAG}%b%f %F{yellow}%~%f > "
 
 # ------------------------------------------------------------------ 히스토리
 HISTFILE=~/.zsh_history
